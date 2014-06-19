@@ -1,0 +1,28 @@
+#! /usr/bin/env ruby
+
+puts "Input your email:"
+email = gets.chomp
+user = User.find_by(email: email)
+
+puts "What do you want to do?"
+puts "0. Create shortened URL"
+puts "1. Visit shortened URL"
+begin
+  input = Integer(gets.chomp)
+  raise RuntimeError unless [0,1].include?(input)
+rescue ArgumentError, RuntimeError
+  puts "Enter 0 or 1"
+  retry
+end
+
+if input == 0
+  puts "please enter long url"
+  long_url = gets.chomp
+  shorturl = ShortenedUrl.create_for_user_and_long_url!(user, long_url)
+  puts "Short url is: #{shorturl.short_url}"
+else
+  puts "please enter short url"
+  short_url = gets.chomp
+  shortened_url_object = ShortenedUrl.find_by(short_url: short_url)  
+  Visit.record_visit!(user, shortened_url_object)
+end
